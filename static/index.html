@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MatchLink - Company Name Templater</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Style -->
+    <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="glow-container">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+    </div>
+
+    <div class="app-container">
+        <header class="app-header animate-fade-in">
+            <div class="logo">
+                <i class="fa-solid fa-wand-magic-sparkles logo-icon"></i>
+                <span class="logo-text">Match<span>Link</span></span>
+            </div>
+            <p class="tagline">Generate standardized Cleaned Name, Left 25, Left 15, and Left 10 helper columns</p>
+        </header>
+
+        <main class="main-content">
+            <!-- STEP 1: Upload / Input Card -->
+            <section id="step-input" class="glass-card animate-slide-up">
+                <div class="card-header">
+                    <h2>Ingest Company List</h2>
+                    <p class="section-desc">Upload a CSV/Excel file or paste plain text. The tool will automatically clean the legal suffixes and generate key-prefix slices.</p>
+                </div>
+
+                <!-- Input Toggles -->
+                <div class="input-toggle-bar">
+                    <button class="toggle-btn active" id="toggle-file" type="button">
+                        <i class="fa-solid fa-file-arrow-up"></i> File Upload
+                    </button>
+                    <button class="toggle-btn" id="toggle-text" type="button">
+                        <i class="fa-solid fa-align-left"></i> Paste Text
+                    </button>
+                </div>
+
+                <!-- File Dropzone -->
+                <div class="upload-zone" id="zone-file">
+                    <input type="file" id="input-file-element" accept=".csv, .xlsx, .xls, .txt" hidden>
+                    <div class="zone-content">
+                        <div class="icon-wrapper">
+                            <i class="fa-solid fa-file-excel icon-main"></i>
+                            <i class="fa-solid fa-check icon-check"></i>
+                        </div>
+                        <h3>Upload Spreadsheet</h3>
+                        <p class="upload-hint">Drag & drop or <span>browse</span></p>
+                        <p class="file-info" id="info-file">No file selected (Supports CSV, XLSX, XLS, TXT)</p>
+                    </div>
+                </div>
+
+                <!-- Textarea Paste (Hidden by default) -->
+                <div class="text-input-zone hidden" id="zone-text">
+                    <textarea id="txt-area" placeholder="Enter company names here, one per line...&#10;Example:&#10;Google LLC&#10;Tesla Motors, Inc.&#10;Microsoft Corporation&#10;PT. L.T.D. Suffixes"></textarea>
+                </div>
+
+                <!-- Column Selection & Config (Hidden by default, shown when multi-column file uploaded) -->
+                <div class="config-box hidden" id="config-box">
+                    <div class="form-group">
+                        <label for="select-company-col">Select Company Name Column <span class="required">*</span></label>
+                        <div class="select-wrapper">
+                            <select id="select-company-col"></select>
+                        </div>
+                        <p class="slider-desc" style="margin-top: 0.5rem;">Select the column containing the company names to standardize.</p>
+                    </div>
+                </div>
+
+                <!-- Options Box -->
+                <div class="config-box" style="margin-bottom: 1.5rem;">
+                    <div class="params-header">
+                        <i class="fa-solid fa-filter text-indigo"></i>
+                        <h3>Processing Options</h3>
+                    </div>
+                    <div class="form-group checkbox-group" style="margin-bottom: 0;">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="chk-dedup" checked>
+                            <span>Remove Duplicate Rows</span>
+                        </label>
+                        <p class="slider-desc" style="margin-top: 0.5rem;">If unchecked, all rows (including duplicates) will be processed in their exact original order.</p>
+                    </div>
+                </div>
+
+                <!-- Export Format Selection -->
+                <div class="format-box">
+                    <div class="params-header">
+                        <i class="fa-solid fa-file-export text-indigo"></i>
+                        <h3>Output Format</h3>
+                    </div>
+                    <div class="radio-toggle-bar">
+                        <label class="radio-label">
+                            <input type="radio" name="export-format" value="excel" checked>
+                            <span>Excel Workbook (.xlsx)</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="export-format" value="csv">
+                            <span>CSV Dataset (.csv)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="action-footer">
+                    <button id="btn-generate" class="btn btn-primary" disabled>
+                        <span>Generate Template</span>
+                        <i class="fa-solid fa-bolt"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- STEP 2: Loading State (Hidden by default) -->
+            <section id="step-loading" class="glass-card hidden text-center">
+                <div class="processing-wrapper">
+                    <div class="spinner-container">
+                        <svg class="spinner" viewBox="0 0 50 50">
+                            <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+                        </svg>
+                    </div>
+                    <h2>Formatting and Slicing...</h2>
+                    <p class="processing-sub">Normalizing legal entities and generating slice offsets (Cleaned, Left 25, Left 15, Left 10).</p>
+                </div>
+            </section>
+
+            <!-- STEP 3: Success / Download Card (Hidden by default) -->
+            <section id="step-results" class="glass-card hidden text-center">
+                <div class="card-header">
+                    <div class="success-badge">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                    <h2>Templating Complete!</h2>
+                    <p class="section-desc" id="results-desc">Your spreadsheet has been formatted successfully.</p>
+                </div>
+
+                <div class="results-box">
+                    <div class="metric-row">
+                        <span>Total Records Processed:</span>
+                        <strong id="metric-total">0</strong>
+                    </div>
+                    <div class="metric-row">
+                        <span>Columns Appended:</span>
+                        <strong style="font-size: 0.85rem; color: #818cf8;">Cleaned Name (exact match, no spaces/chars), by Left 25 Characters, by Left 15 Characters, by Left 10 Characters</strong>
+                    </div>
+                </div>
+
+                <div class="action-footer justify-center">
+                    <button id="btn-restart" class="btn btn-secondary">
+                        <i class="fa-solid fa-rotate-left"></i>
+                        <span>Start Over</span>
+                    </button>
+                    <button id="btn-download" class="btn btn-success">
+                        <i class="fa-solid fa-file-excel"></i>
+                        <span>Download Results</span>
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="static/app.js"></script>
+</body>
+</html>
