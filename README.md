@@ -1,5 +1,11 @@
 # Match Link // Company Name Templater
 
+[![CI](https://github.com/jgmchavez-22/Match-Link/actions/workflows/ci.yml/badge.svg)](https://github.com/jgmchavez-22/Match-Link/actions)
+[![Python](https://img.shields.io/badge/Python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-1.0.0-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 > An automated data-cleaning and Excel lookup-helper generator that standardizes corporate entity names and dynamically builds prefix-matching formula columns.
 
 ---
@@ -8,11 +14,11 @@
 
 When reconciling customer, vendor, or lead lists across CRM databases, accounting systems, and marketing platforms, differences in legal suffixes (such as `PTE. LTD.`, `LLC`, `Corp`, `Private Limited`) and punctuation prevent clean exact matches (`VLOOKUP`, `XLOOKUP`, `INDEX/MATCH`).
 
-**MatchLink Company Name Templater** is a local web application powered by **FastAPI** and **Pandas**. It ingests messy company datasets via file upload (`.xlsx`, `.xls`, `.csv`, `.txt`) or direct multi-line text paste, standardizes legal suffix variants, strips non-alphanumeric noise to yield a unified core string, and dynamically appends native Excel formulas for tiered substring matching (`Left 25`, `Left 15`, `Left 10`).
+**MatchLink Company Name Templater** is a web application and operational utility powered by **FastAPI** and **Pandas**. It ingests messy company datasets via file upload (`.xlsx`, `.xls`, `.csv`, `.txt`) or direct multi-line text paste, standardizes legal suffix variants, strips non-alphanumeric noise to yield a unified core string, and dynamically appends native Excel formulas for tiered substring matching (`Left 25`, `Left 15`, `Left 10`).
 
 ---
 
-## Implemented Features
+## Key Features
 
 - **Legal Entity Standardization & Cleaning:**
   - Standardizes diverse abbreviations and spellings of legal entities (e.g., `P.T.E. L.T.D.`, `PTE LTD`, `PT. LTD.`, `PRIVATE LIMITED` &rarr; `LTD`; `CORPORATION` &rarr; `CORP`).
@@ -39,30 +45,41 @@ When reconciling customer, vendor, or lead lists across CRM databases, accountin
   - **Excel Workbook (`.xlsx`):** Formatted sheet with auto-adjusted column widths via OpenPyXL.
   - **CSV Dataset (`.csv`):** Lightweight plain text export for database and ETL ingestion.
 
-- **Automated Test Suite:**
-  - Unit tests covering regex tokenization, suffix normalization, formula row offsetting, and REST API endpoints.
+- **Memory Safety & Bounded Cache:**
+  - Implements `BoundedResultStore` with time-to-live (TTL) eviction and item caps, eliminating memory exhaustion vulnerabilities on sustained workloads.
+
+- **Production Engineering & CI/CD:**
+  - Comprehensive `pytest` test suite with 94%+ code coverage.
+  - Automated GitHub Actions matrix CI testing Python 3.9, 3.10, 3.11, and 3.12 with `ruff` code formatting and linting.
+  - Docker containerization ready for one-command deployment.
 
 ---
 
 ## Architecture & Technology Stack
 
-- **Backend:** [FastAPI](https://fastapi.tiangolo.com/) (Python 3.8+)
+- **Backend:** [FastAPI](https://fastapi.tiangolo.com/) (Python 3.9+)
 - **Server:** [Uvicorn](https://www.uvicorn.org/) ASGI server
 - **Data Processing:** [Pandas](https://pandas.pydata.org/) & [OpenPyXL](https://openpyxl.readthedocs.io/)
 - **Frontend:** Vanilla JavaScript (ES6+), HTML5, CSS3 with glassmorphism UI styling
-- **Icons & Fonts:** FontAwesome 6, Google Fonts (Outfit)
+- **CI/CD & Quality:** GitHub Actions, `pytest`, `pytest-cov`, `ruff`
+- **Containerization:** Docker & Docker Compose
 
 ---
 
-## Prerequisites
+## Quick Start & Installation
 
-- **Python 3.8** or higher
-- `pip` (Python package installer)
-- Modern web browser (Chrome, Edge, Firefox)
+### Option 1: Docker (Fastest, zero local dependencies)
+
+```bash
+git clone https://github.com/jgmchavez-22/Match-Link.git
+cd Match-Link
+docker compose up --build
+```
+Navigate to `http://localhost:8000` in your browser.
 
 ---
 
-## Installation & Setup
+### Option 2: Local Python Setup
 
 1. **Clone the repository:**
    ```bash
@@ -70,71 +87,40 @@ When reconciling customer, vendor, or lead lists across CRM databases, accountin
    cd Match-Link
    ```
 
-2. **Create and activate a virtual environment (recommended):**
-   - On Windows (PowerShell):
-     ```powershell
-     python -m venv venv
-     .\venv\Scripts\Activate.ps1
-     ```
-   - On macOS/Linux:
+2. **Run via automated script:**
+   - **On macOS/Linux:**
      ```bash
-     python3 -m venv venv
-     source venv/bin/activate
+     chmod +x run.sh
+     ./run.sh
+     ```
+   - **On Windows:**
+     ```cmd
+     run.bat
      ```
 
-3. **Install dependencies:**
+3. **Or run manually with virtual environment:**
    ```bash
-   pip install -r requirements.txt
+   python3 -m venv .venv
+   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+   pip install -r requirements-dev.txt
+   uvicorn main:app --reload --port 8000
    ```
+   Open `http://localhost:8000` in your browser.
 
 ---
 
-## Running the Application
+## Testing & Quality Assurance
 
-### Option 1: One-Click Startup (Windows)
-Run the provided batch script from the project folder:
-```cmd
-run.bat
-```
-The script will:
-1. Verify Python availability on `PATH`.
-2. Check and install missing dependencies from `requirements.txt`.
-3. Open your default browser to `http://localhost:8001`.
-4. Launch the FastAPI server with auto-reload enabled.
+The repository includes a comprehensive automated test suite with full coverage of regex tokenization, suffix normalization, formula injection, bounded cache eviction, and API endpoints:
 
-### Option 2: Manual CLI Launch
-Start the server directly using Uvicorn:
 ```bash
-python -m uvicorn main:app --port 8001 --reload
+# Run pytest with code coverage report
+pytest --cov=. --cov-report=term-missing
+
+# Run ruff lint and format check
+ruff check .
+ruff format --check .
 ```
-Once started, navigate to:
-```
-http://localhost:8001
-```
-
----
-
-## Configuration & Environment Variables
-
-No external API keys or `.env` variables are required. The server runs self-contained on localhost (`http://localhost:8001`).
-
----
-
-## Testing
-
-The project includes unit and endpoint tests in `test_templater.py`.
-
-Run the test suite:
-```bash
-python test_templater.py
-```
-
-The test script validates:
-1. Suffix standardization (e.g. `PTE. LTD.` &rarr; `LTD`, `PT. L.T.D.` &rarr; `LTD`).
-2. Company name cleaning and whitespace/punctuation elimination.
-3. Column index calculation and Excel formula string generation.
-4. Header parsing endpoint (`/api/parse-headers`).
-5. Templating and export logic with both deduplication enabled and disabled (`/api/template`).
 
 ---
 
@@ -142,27 +128,33 @@ The test script validates:
 
 ```
 Match-Link/
-├── main.py              # FastAPI application, cleaning logic, and export endpoints
-├── requirements.txt     # Python package dependencies
-├── run.bat              # Windows one-click startup batch script
-├── test_templater.py    # Unit and API integration test suite
-├── .gitignore           # Git ignore rules for Python, cache, and OS artifacts
-├── README.md            # Project documentation
+├── .github/
+│   └── workflows/
+│       └── ci.yml              # GitHub Actions CI matrix workflow (Py 3.9-3.12)
+├── tests/
+│   ├── __init__.py
+│   └── test_templater.py       # Comprehensive pytest test suite (30+ test cases)
+├── main.py                     # FastAPI application, cleaning logic, and export endpoints
+├── pyproject.toml              # Modern PEP 621 package and tool configuration
+├── requirements.txt            # Production dependencies
+├── requirements-dev.txt        # Development, testing, and linting dependencies
+├── Dockerfile                  # Container build specification
+├── docker-compose.yml          # Container compose service
+├── run.sh                      # macOS/Linux launcher script
+├── run.bat                     # Windows one-click startup script
+├── test_templater.py           # Backwards-compatible test runner
+├── .gitignore                  # Git ignore rules
+├── LICENSE                     # MIT License
+├── README.md                   # Project documentation
 └── static/
-    ├── index.html       # Web application structure
-    ├── style.css        # Responsive dark-theme glassmorphism styles
-    └── app.js           # Client-side state, drag-and-drop, and API integration
+    ├── index.html              # Web application structure
+    ├── style.css               # Responsive dark-theme glassmorphism styles
+    └── app.js                  # Client-side state, drag-and-drop, and API integration
 ```
-
----
-
-## Known Limitations
-
-- In-memory results store: Processed files are cached in server memory (`results_store`) keyed by UUID and removed upon download. For high-volume multi-user production environments, a persistent storage or Redis cache layer would be recommended.
-- Standalone execution: Designed for local desktop or internal operations server use; authentication and multi-tenancy are not implemented.
 
 ---
 
 ## Author & Attribution
 
-Developed by **Jan Gabriel Chavez** ([@jgmchavez-22](https://github.com/jgmchavez-22)).
+Developed by **Jan Gabriel Chavez** ([@jgmchavez-22](https://github.com/jgmchavez-22)).  
+Database Management & Workflow Automation Specialist.
