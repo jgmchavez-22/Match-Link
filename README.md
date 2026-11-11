@@ -1,4 +1,4 @@
-# MatchLink // Company Name Templater
+# Match Link // Company Name Templater
 
 > An automated data-cleaning and Excel lookup-helper generator that standardizes corporate entity names and dynamically builds prefix-matching formula columns.
 
@@ -66,8 +66,8 @@ When reconciling customer, vendor, or lead lists across CRM databases, accountin
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/jgmchavez-22/company-name-templater.git
-   cd company-name-templater
+   git clone https://github.com/jgmchavez-22/Match-Link.git
+   cd Match-Link
    ```
 
 2. **Create and activate a virtual environment (recommended):**
@@ -141,7 +141,7 @@ The test script validates:
 ## Project Structure
 
 ```
-company-name-templater/
+Match-Link/
 ├── main.py              # FastAPI application, cleaning logic, and export endpoints
 ├── requirements.txt     # Python package dependencies
 ├── run.bat              # Windows one-click startup batch script
