@@ -6,11 +6,11 @@ Automated legal entity standardizer and Excel lookup helper generator.
 from __future__ import annotations
 
 import io
-from pathlib import Path
 import re
 import time
 import uuid
 from collections import OrderedDict
+from pathlib import Path
 from typing import Any
 
 import pandas as pd
