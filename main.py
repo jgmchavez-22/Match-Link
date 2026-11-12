@@ -6,6 +6,7 @@ Automated legal entity standardizer and Excel lookup helper generator.
 from __future__ import annotations
 
 import io
+from pathlib import Path
 import re
 import time
 import uuid
@@ -322,9 +323,10 @@ async def api_download(download_id: str) -> StreamingResponse:
 
 
 # Serve frontend
-app.mount("/static", StaticFiles(directory="static"), name="static")
+STATIC_DIR = Path(__file__).resolve().parent / "static"
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 
 @app.get("/")
 async def read_root() -> FileResponse:
-    return FileResponse("static/index.html")
+    return FileResponse(str(STATIC_DIR / "index.html"))
